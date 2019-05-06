@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,8 +20,6 @@ using Pener.Server.Services.Auth;
 using Pener.Server.Services.Jwt;
 using Pener.Services.User;
 using Raven.DependencyInjection;
-using Raven.Identity;
-using Raven.StructuredLog;
 
 namespace Pener.Server
 {
@@ -39,10 +38,8 @@ namespace Pener.Server
             // use RavenDB
             services.Configure<RavenSettings>(Configuration.GetSection("RavenSettings"));
             services.AddRavenDbDocStore();
+            services.AddRavenDbSession();
             services.AddRavenDbAsyncSession();
-
-            // use RavenDB,Identity
-            services.AddRavenDbIdentity<User>();
 
             // use ASP.NET Core MVC
             services
@@ -51,6 +48,13 @@ namespace Pener.Server
 
             // use Response Compression.
             services.AddResponseCompression();
+
+            // use Identity.
+            services
+                .AddIdentity<User, Role>()
+                .AddUserStore<UserStore>()
+                .AddRoleStore<RoleStore>()
+                .AddDefaultTokenProviders();
 
             // use Jwt Authentication
             services.AddAuthentication(options =>
@@ -71,7 +75,6 @@ namespace Pener.Server
 
             // use Pener Services
             services.AddJwtService(Configuration);
-            services.AddUserService(Configuration);
             services.AddAuthService(Configuration);
         }
 
