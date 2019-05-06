@@ -2,8 +2,8 @@
 
 namespace Pener.Services.User
 {
-    public interface IUserService
+    public class Role : IdentityRole
     {
-        UserManager<User> UserManager { get; }
+
     }
 }
