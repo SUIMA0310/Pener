@@ -4,6 +4,6 @@ namespace Pener.Server.Services.Jwt
 {
     public interface IJwtService
     {
-        string CreateToken(IUser user);
+        string CreateToken(User user);
     }
 }

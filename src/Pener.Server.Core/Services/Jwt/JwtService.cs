@@ -1,7 +1,9 @@
+using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
@@ -18,29 +20,42 @@ namespace Pener.Server.Services.Jwt
         private readonly JwtSecurityTokenHandler _handler;
         private readonly JwtServiceConfig _config;
 
-        public virtual string CreateToken(IUser user)
+        public JwtService(
+            JwtSecurityTokenHandler handler,
+            IOptions<JwtServiceConfig> options)
         {
-            var claims = new List<Claim>();
-
-            claims.AddNameId(user.Id);
-            claims.AddUniqueName(user.UserName);
-
-            claims.AddAudiences(_config.Audiences);
-            claims.AddIssuer(_config.Issuer);
-
-            claims.AddJti();
-
-            claims.AddExpire(_config.ExpireTime);
-            claims.AddNotbefore();
-
-            return CreateToken(claims);
+            _handler = handler;
+            _config = options.Value;
         }
 
-        protected virtual string CreateToken(IEnumerable<Claim> claims)
+        public virtual string CreateToken(User user)
+        {
+            var claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.NameId, user.Id),
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.UserName),
+                new Claim(JwtRegisteredClaimNames.Jti, GetJti())
+            };
+
+            return CreateToken(
+                issuer: _config.Issuer,
+                audience: _config.Audience,
+                claims: claims,
+                notBefore: DateTime.Now,
+                expires: DateTime.Now.AddMinutes(_config.ExpireTime)
+            );
+        }
+
+        protected virtual string CreateToken(
+            string issuer, 
+            string audience, 
+            IEnumerable<Claim> claims, 
+            DateTime? notBefore, 
+            DateTime? expires)
         {
             var token = new JwtSecurityToken(
                 header: new JwtHeader(GetCredentials()),
-                payload: new JwtPayload(claims));
+                payload: new JwtPayload(issuer, audience, claims, notBefore, expires));
 
             return _handler.WriteToken(token);
         }
@@ -76,9 +91,38 @@ namespace Pener.Server.Services.Jwt
                 ValidateIssuer = config?.Issuer != null,
                 ValidIssuer = config?.Issuer,
 
-                ValidateAudience = config?.Audiences?.Any() ?? false,
-                ValidAudiences = config?.Audiences
+                ValidateAudience = config?.Audience != null,
+                ValidAudience = config?.Audience
             };
+        }
+
+        private string GetJti()
+        {
+            return ToHexString(GetRandomBytes());
+        }
+
+        private byte[] GetRandomBytes()
+        {
+            var random = new RNGCryptoServiceProvider();
+            var bytes = new byte[16];
+
+            // get random bytes.
+            random.GetBytes(bytes);
+
+            return bytes;
+        }
+
+        private string ToHexString(IEnumerable<byte> bytes)
+        {
+            var capacity = bytes.Count() * 2;
+            var bilder = new StringBuilder(capacity);
+
+            foreach (var b in bytes)
+            {
+                bilder.AppendFormat("{0:x2}", b);
+            }
+
+            return bilder.ToString();
         }
     }
 }

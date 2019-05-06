@@ -6,7 +6,7 @@
 
         public string Issuer { get; set; }
 
-        public string[] Audiences { get; set; }
+        public string Audience { get; set; }
 
         public int ExpireTime { get; set; }
     }
