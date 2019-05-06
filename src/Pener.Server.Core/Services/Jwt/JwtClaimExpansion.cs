@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
+using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Pener.Server.Services.Jwt
 {
@@ -75,20 +78,37 @@ namespace Pener.Server.Services.Jwt
 
         private static string GetJti()
         {
-            var random = new Random();
-            var bytes = new byte[128];
-
-            // get random bytes.
-            random.NextBytes(bytes);
-
-            // convert to string.
-            return Convert.ToBase64String(bytes);
+            return GetRandomBytes().ToHexString();
         }
 
         private static string GetUnixTime(DateTime time)
         {
             var baseTime = new DateTime(1970, 1, 1);
             return (time - baseTime).Seconds.ToString();
+        }
+
+        private static byte[] GetRandomBytes()
+        {
+            var random = new RNGCryptoServiceProvider();
+            var bytes = new byte[32];
+
+            // get random bytes.
+            random.GetBytes(bytes);
+
+            return bytes;
+        }
+
+        private static string ToHexString(this IEnumerable<byte> bytes)
+        {
+            var capacity = bytes.Count() * 2;
+            var bilder = new StringBuilder(capacity);
+
+            foreach (var b in bytes)
+            {
+                bilder.AppendFormat("{0:x2}", b);
+            }
+
+            return bilder.ToString();
         }
     }
 }
