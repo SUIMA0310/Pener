@@ -1,12 +1,14 @@
+using System;
+
 namespace Pener.Client.Services.Auth
 {
     public class AuthServiceConfig
     {
-        private string _AuthServerAddress;
+        private Uri _AuthServerAddress;
 
-        public string ServerAddress { get; set; }
+        public Uri ServerAddress { get; set; }
 
-        public string AuthServerAddress
+        public Uri AuthServerAddress
         {
             get => _AuthServerAddress ?? ServerAddress;
             set => _AuthServerAddress = value;

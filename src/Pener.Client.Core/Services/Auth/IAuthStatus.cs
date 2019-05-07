@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Pener.Client.Services.Auth
 {
     public interface IAuthStatus
     {
         string UserName { get; }
-        Guid UserId { get; }
+        string UserId { get; }
 
-        DateTime NotValidBefore { get; }
-        DateTime ExpirationTime { get; }
+        DateTime? NotValidBefore { get; }
+        DateTime? ExpirationTime { get; }
 
         string Issuer { get; }
-        string Audience { get; }
+        IEnumerable<string> Audiences { get; }
     }
 }
