@@ -5,6 +5,7 @@ using System.Net.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Pener.Client.Services.Jwt;
+using Microsoft.Extensions.Options;
 
 namespace Pener.Client.Services.Auth
 {
@@ -36,9 +37,13 @@ namespace Pener.Client.Services.Auth
             services.AddSingleton(x => 
             {
                 var jwtService = x.GetService<IJwtService>();
+                var option = x.GetService<IOptions<AuthServiceConfig>>();
                 var handler = new AuthDelegatingHandler(jwtService, innerHandler);
 
-                return new HttpClient(handler);
+                return new HttpClient(handler)
+                {
+                    BaseAddress = option.Value.ServerAddress
+                };
             });
 
             return services;
