@@ -19,8 +19,9 @@ namespace Pener.Client.Cli.Commands.Auth
 
         public async Task OnExecuteAsync(CommandLineApplication app)
         {
-            try
+            if (await _authService.IsAuthenticatedAsync(true))
             {
+
                 var status = await _authService.GetAuthStatusAsync();
 
                 Console.WriteLine($"ログイン中   : true");
@@ -28,9 +29,8 @@ namespace Pener.Client.Cli.Commands.Auth
                 Console.WriteLine($"有効期限     : {status.ExpirationTime.ToString()}");
                 Console.WriteLine($"ユーザId     : {status.UserId}");
                 Console.WriteLine($"ユーザ名     : {status.UserName}");
-
             }
-            catch
+            else
             {
                 Console.WriteLine($"ログイン中   : false");
             }

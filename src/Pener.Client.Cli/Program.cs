@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-
+using System.Net.Http;
 using McMaster.Extensions.CommandLineUtils;
 
 using Microsoft.Extensions.Configuration;
@@ -38,6 +38,11 @@ namespace Pener.Client.Cli
 
             services.AddJwtService(config);
             services.AddAuthService(config).AddDefaultHttpClient();
+
+            services.PostConfigure<HttpClient>(client => 
+            {
+                client.BaseAddress = new Uri(config["ServerAddress"]);
+            });
         }
 
         public static IServiceCollection CreateServiceCollection()

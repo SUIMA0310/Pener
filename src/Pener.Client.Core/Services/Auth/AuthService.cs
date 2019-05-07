@@ -101,7 +101,8 @@ namespace Pener.Client.Services.Auth
 
         protected virtual async Task<bool> HardLoginCheckAsync()
         {
-            var res = await _httpClient.GetAsync(AUTH_CHECK_URL);
+            var sendUrl = new Uri(_config.AuthServerAddress, AUTH_CHECK_URL);
+            var res = await _httpClient.GetAsync(sendUrl);
             return res.IsSuccessStatusCode;
         }
     }
