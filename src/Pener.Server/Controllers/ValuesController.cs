@@ -34,7 +34,7 @@ namespace Pener.Server.Controllers
                 UserName = "Admin"
             };
             await _userManager.CreateAsync(user);
-            await _userManager.AddPasswordAsync(user, "!123456abcDEF");
+            await _userManager.AddPasswordAsync(user, "hogehoge123");
             await _dbSession.SaveChangesAsync();
             return new string[] { "value1", "value2" };
         }
