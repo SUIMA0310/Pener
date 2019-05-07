@@ -24,7 +24,7 @@ namespace Pener.Client.Cli.Commands.Auth
             _authService = loginService;
         }
 
-        public async Task OnExecute(CommandLineApplication app)
+        public async Task OnExecuteAsync(CommandLineApplication app)
         {
             if (UserName == null)
             {
