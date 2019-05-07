@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Pener.Client.Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "auth login"
+    }
+  }
+}

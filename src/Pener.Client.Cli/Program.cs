@@ -7,6 +7,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
 using Pener.Client.Cli.Commands;
+using Pener.Client.Services.Auth;
+using Pener.Client.Services.Jwt;
 
 namespace Pener.Client.Cli
 {
@@ -34,8 +36,8 @@ namespace Pener.Client.Cli
         {
             services.AddOptions();
 
-            //services.AddJwtService(config);
-            //services.AddLoginService(config);
+            services.AddJwtService(config);
+            services.AddAuthService(config).AddDefaultHttpClient();
         }
 
         public static IServiceCollection CreateServiceCollection()
@@ -47,7 +49,7 @@ namespace Pener.Client.Cli
         {
             return new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsetting.json")
+                .AddJsonFile("appsettings.json")
                 .AddCommandLine(Environment.GetCommandLineArgs())
                 .Build();
         }
