@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication;
 using Pener.Server.Services.Auth;
 using Pener.Models.Auth;
 
@@ -12,7 +13,7 @@ namespace Pener.Server.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [AllowAnonymous]
+    [Authorize]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
@@ -24,6 +25,7 @@ namespace Pener.Server.Controllers
         }
 
         [HttpPost("login")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login(LoginRequest request)
         {
             if (!ModelState.IsValid ||
@@ -49,7 +51,6 @@ namespace Pener.Server.Controllers
         }
 
         [HttpGet("check")]
-        [Authorize]
         public async Task<IActionResult> Check()
         {
             await Task.CompletedTask;

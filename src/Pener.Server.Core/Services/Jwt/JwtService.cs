@@ -64,9 +64,14 @@ namespace Pener.Server.Services.Jwt
         /// SecurityKeyÇê∂ê¨Ç∑ÇÈ
         /// </summary>
         /// <returns>SecurityKey</returns>
-        protected virtual SecurityKey GetSecurityKey()
+        protected static SecurityKey GetSecurityKey(string baseKey)
         {
-            var bytes = Encoding.UTF8.GetBytes(_config.SigningKey);
+            if (string.IsNullOrEmpty(baseKey))
+            {
+                return null;
+            }
+
+            var bytes = Encoding.UTF8.GetBytes(baseKey);
             return new SymmetricSecurityKey(bytes);
         }
 
@@ -76,23 +81,28 @@ namespace Pener.Server.Services.Jwt
         /// <returns>SigningCredentials</returns>
         protected virtual SigningCredentials GetCredentials()
         {
-            var key = GetSecurityKey();
+            var key = GetSecurityKey(_config.SigningKey)??throw new Exception("KeyÇÃçÏê¨Ç…é∏îs");
             return new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
         }
 
-        public static TokenValidationParameters GetValidationParameters(IConfiguration configuration)
+        public static TokenValidationParameters GetValidationParameters(IConfiguration config)
         {
-            var config = configuration.GetValue<JwtServiceConfig>(CONFIG_SECTION_NAME);
+            var issuer = config[$"{CONFIG_SECTION_NAME}:{nameof(JwtServiceConfig.Issuer)}"];
+            var audience = config[$"{CONFIG_SECTION_NAME}:{nameof(JwtServiceConfig.Audience)}"];
+            var signingKey = config[$"{CONFIG_SECTION_NAME}:{nameof(JwtServiceConfig.SigningKey)}"];
 
             return new TokenValidationParameters()
             {
                 ValidateLifetime = true,
 
-                ValidateIssuer = config?.Issuer != null,
-                ValidIssuer = config?.Issuer,
+                ValidateIssuer = issuer != null,
+                ValidIssuer = issuer,
 
-                ValidateAudience = config?.Audience != null,
-                ValidAudience = config?.Audience
+                ValidateAudience = audience != null,
+                ValidAudience = audience,
+
+                ValidateIssuerSigningKey = signingKey != null,
+                IssuerSigningKey = GetSecurityKey(signingKey)
             };
         }
 
