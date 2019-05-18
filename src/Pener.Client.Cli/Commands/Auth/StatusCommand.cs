@@ -24,15 +24,16 @@ namespace Pener.Client.Cli.Commands.Auth
 
                 var status = await _authService.GetAuthStatusAsync();
 
-                Console.WriteLine($"ログイン中   : true");
+                Console.WriteLine($"ステータス   : ログイン中");
+                Console.WriteLine($"ユーザ名     : {status.UserName}");
+                Console.WriteLine($"ユーザId     : {status.UserId}");
                 Console.WriteLine($"ログイン時刻 : {status.NotValidBefore.ToString()}");
                 Console.WriteLine($"有効期限     : {status.ExpirationTime.ToString()}");
-                Console.WriteLine($"ユーザId     : {status.UserId}");
-                Console.WriteLine($"ユーザ名     : {status.UserName}");
+
             }
             else
             {
-                Console.WriteLine($"ログイン中   : false");
+                Console.WriteLine($"ステータス   : ログアウト");
             }
         }
     }
